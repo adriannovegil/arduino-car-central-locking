@@ -34,5 +34,5 @@ const int CHILDREN_LOCKING[2] = {ACTUATOR_IN_7, ACTUATOR_IN_8};
 
 // Wait time between actuator phases
 const int WAIT_TIME = 500;
-const int LOOP_TIME = 500;
+const int LOOP_TIME = 100;
 
