@@ -3,25 +3,30 @@
  * 
  * created 2019
  * by Adrian Novegil <adrian.novegil@gmail.com>
- * 
+ *
  * This is Open Source software released under the Apache 2.0 license
- * 
+ *
  */
 
 #include "constants.h"
 
-// variables will change:
-int buttonState = 0;         // variable for reading the pushbutton status
-boolean centralLockState = false;
+// Variable for reading the pushbutton status
+int buttonState = 0;
+// Central locking state. Open or Close ;-)
+boolean centralLockingState = false;
+boolean childrenLockingState = false;
 
+/**
+ * System configuration
+ */
 void setup() {
-  // initialize the pushbutton pin as an input:
+  // Initialize the pushbutton pin as an input:
   pinMode(BUTTON_1_PIN, INPUT);
   pinMode(BUTTON_2_PIN, INPUT);
   pinMode(BUTTON_3_PIN, INPUT);
   pinMode(BUTTON_4_PIN, INPUT);
   
-  // initialize the pin to control the motors  
+  // Initialize the pin to control the motors  
   pinMode(ACTUATOR_IN_1, OUTPUT);
   pinMode(ACTUATOR_IN_2, OUTPUT);
   pinMode(ACTUATOR_IN_3, OUTPUT);
@@ -32,55 +37,165 @@ void setup() {
   pinMode(ACTUATOR_IN_8, OUTPUT);
 }
 
+/**
+ * System loop
+ */
 void loop() {
   // Read the state of the pushbutton value:
-  // Check if the pushbutton is pressed.
+  // Normal mode
   if (digitalRead(BUTTON_1_PIN) == HIGH) {
-    // delay to debounce switch
+    // Delay to debounce switch
     delay(100);
-    centralLockState = !centralLockState;
-   // Change the door state
-   if(centralLockState) {
-     moveForward(FRONT_DOORS);
-     moveForward(BACK_DOORS);
-     moveForward(CAR_TRUNK_DOOR);
-     delay(WAIT_TIME); 
-     fullStop(FRONT_DOORS);
-     fullStop(BACK_DOORS);
-     fullStop(CAR_TRUNK_DOOR);
-   } else {
-     moveBackward(FRONT_DOORS);
-     moveBackward(BACK_DOORS);
-     moveBackward(CAR_TRUNK_DOOR);
-     delay(WAIT_TIME); 
-     fullStop(FRONT_DOORS);
-     fullStop(BACK_DOORS);
-     fullStop(CAR_TRUNK_DOOR);
-   }
-    
+    // Change the door state
+    if(centralLockingState) {
+      openFrontDoors();
+    } else {
+      closeAllDoorsAndTrunkDoor();
+    }
+    centralLockingState = !centralLockingState;
   }
-  delay(100); 
+  // Open and close all :-P
+  if (digitalRead(BUTTON_2_PIN) == HIGH) {
+    // Delay to debounce switch
+    delay(100);
+    // Change the door state
+    if(centralLockingState) {
+      openAllDoorsAndTrunkDoor();
+    } else {
+      closeAllDoorsAndTrunkDoor();
+    }
+    centralLockingState = !centralLockingState;
+  }
+  // Trunk door button
+  if (digitalRead(BUTTON_3_PIN) == HIGH) {
+    // Delay to debounce switch
+    delay(100);
+    // Change the door state
+    if(centralLockingState) {
+      openTrunkDoor();
+    } else {
+      closeTrunkDoor();
+    }
+    centralLockingState = !centralLockingState;
+  }
+  // Children locking buttons
+  if (digitalRead(BUTTON_4_PIN) == HIGH) {
+    // Delay to debounce switch
+    delay(100);
+    // Change the door state
+    if(childrenLockingState) {
+      // Nothing for the moment
+    } else {
+      // Nothing for the moment
+    }
+    childrenLockingState = !childrenLockingState;
+  }
+  delay(LOOP_TIME); 
 }
 
-void openFrontDoors () {}
+/**
+ * Open front doors
+ */
+void openFrontDoors () {
+  moveForward(FRONT_DOORS);
+  delay(WAIT_TIME); 
+  fullStop(FRONT_DOORS);
+}
 
-void closeFrontDoors () {}
+/**
+ * Close front doors
+ */
+void closeFrontDoors () {
+  moveBackward(FRONT_DOORS);
+  delay(WAIT_TIME); 
+  fullStop(FRONT_DOORS);
+}
 
-void openBackDoors () {}
+/**
+ * Open back doors
+ */
+void openBackDoors () {
+  moveForward(BACK_DOORS);
+  delay(WAIT_TIME); 
+  fullStop(BACK_DOORS);
+}
 
-void closeBackDoors () {}
+/**
+ * Close back doors
+ */
+void closeBackDoors () {
+  moveBackward(BACK_DOORS);
+  delay(WAIT_TIME); 
+  fullStop(BACK_DOORS);
+}
 
-void openTrunkDoor () {}
+/**
+ * Open trunk door
+ */
+void openTrunkDoor () {
+  moveForward(CAR_TRUNK_DOOR);
+  delay(WAIT_TIME); 
+  fullStop(CAR_TRUNK_DOOR);
+}
 
-void closeTrunkDoor () {}
+/**
+ * Close trunk door
+ */
+void closeTrunkDoor () {
+  moveBackward(CAR_TRUNK_DOOR);
+  delay(WAIT_TIME); 
+  fullStop(CAR_TRUNK_DOOR);
+}
 
-void openAllDoor () {}
+/**
+ * Open all the doors
+ */
+void openAllDoor () {
+  moveForward(FRONT_DOORS);
+  moveForward(BACK_DOORS);
+  delay(WAIT_TIME); 
+  fullStop(FRONT_DOORS);
+  fullStop(BACK_DOORS);
+}
 
-void closeAllDoors () {}
+/**
+ * Close all the doors
+ */
+void closeAllDoors () {
+  moveBackward(FRONT_DOORS);
+  moveBackward(BACK_DOORS);
+  delay(WAIT_TIME); 
+  fullStop(FRONT_DOORS);
+  fullStop(BACK_DOORS);
+}
 
-void openAllDoorsAndTrunkDoor () {}
+/**
+ * Open all the doors and the trunk door
+ */
+void openAllDoorsAndTrunkDoor () {
+  moveForward(FRONT_DOORS);
+  moveForward(BACK_DOORS);
+  moveForward(CAR_TRUNK_DOOR);
+  delay(WAIT_TIME); 
+  fullStop(FRONT_DOORS);
+  fullStop(BACK_DOORS);
+  fullStop(CAR_TRUNK_DOOR);
+}
 
-void closeAllDoorsAndTrunkDoor () {}
+/**
+ * Close all the doors and the trunk door
+ */
+void closeAllDoorsAndTrunkDoor () {
+  moveBackward(FRONT_DOORS);
+  moveBackward(BACK_DOORS);
+  moveBackward(CAR_TRUNK_DOOR);
+  delay(WAIT_TIME); 
+  fullStop(FRONT_DOORS);
+  fullStop(BACK_DOORS);
+  fullStop(CAR_TRUNK_DOOR);
+}
+
+// =============================================================================
 
 /**
  * Function to open the doors  
